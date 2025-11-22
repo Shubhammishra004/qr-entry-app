@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Entry Scanner</title>
+  <script src="https://unpkg.com/html5-qrcode"></script>
+
+  <style>
+    body { font-family: Arial; text-align: center; padding: 10px; }
+    #result-box {
+      margin-top: 20px;
+      font-size: 22px;
+      font-weight: bold;
+      padding: 20px;
+      border-radius: 10px;
+    }
+    .allowed { background: #c3f7c3; color: #006600; }
+    .not-allowed { background: #f7c3c3; color: #660000; }
+  </style>
+</head>
+
+<body>
+
+<h2>QR Code Entry Verification</h2>
+<div id="reader" style="width: 320px; margin: auto;"></div>
+
+<div id="result-box"></div>
+
+<script>
+// Your backend URL
+const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxv3zqSWz9NKAeZDZwJzsVd0tI9aWJYdVhTtVwjzNp86URCDThA15RdSL9L6gafKSjy/exec";
+
+function show(message, allowed) {
+  const box = document.getElementById("result-box");
+  box.innerHTML = message;
+  box.className = allowed ? "allowed" : "not-allowed";
+}
+
+function onScanSuccess(qrData) {
+  fetch(BACKEND_URL, {
+    method: "POST",
+    body: JSON.stringify({ qr: qrData })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.message === "Entry Allowed")
+      show("✔ Entry Allowed", true);
+    else
+      show("✘ Entry Not Allowed", false);
+  })
+  .catch(err => show("Error: " + err, false));
+}
+
+new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 })
+  .render(onScanSuccess);
+</script>
+
+</body>
+</html>
