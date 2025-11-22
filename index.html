@@ -22,13 +22,14 @@
 <body>
 
 <h2>QR Code Entry Verification</h2>
-<div id="reader" style="width: 320px; margin: auto;"></div>
+<div id="reader" style="width: 300px; margin: auto;"></div>
 
 <div id="result-box"></div>
 
 <script>
 // Your backend URL
-const BACKEND_URL = "https://script.google.com/macros/s/AKfycbxv3zqSWz9NKAeZDZwJzsVd0tI9aWJYdVhTtVwjzNp86URCDThA15RdSL9L6gafKSjy/exec";
+const BACKEND_URL =
+  "https://script.google.com/macros/s/AKfycbyk4_c24pP6pkenCIUfAiBSUxungfbtvmp6deJ94F2uuwM6IUtO2EYqBBWAxWneEEP4/exec";
 
 function show(message, allowed) {
   const box = document.getElementById("result-box");
@@ -39,14 +40,18 @@ function show(message, allowed) {
 function onScanSuccess(qrData) {
   fetch(BACKEND_URL, {
     method: "POST",
+    headers: {
+      "Content-Type": "application/json"
+    },
     body: JSON.stringify({ qr: qrData })
   })
   .then(r => r.json())
   .then(data => {
-    if (data.message === "Entry Allowed")
+    if (data.message === "Entry Allowed") {
       show("✔ Entry Allowed", true);
-    else
+    } else {
       show("✘ Entry Not Allowed", false);
+    }
   })
   .catch(err => show("Error: " + err, false));
 }
@@ -57,4 +62,3 @@ new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 })
 
 </body>
 </html>
-
